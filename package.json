@@ -1,0 +1,23 @@
+{
+  "name": "ai-gpt-backend",
+  "version": "1.0.0",
+  "description": "Safer Node.js backend for an AI chat app",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "openai": "^7.15.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

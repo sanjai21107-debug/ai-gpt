@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI GPT</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #ffffff;
+    --sidebar: #f7f7f8;
+    --text: #171717;
+    --muted: #777;
+    --border: #e5e5e5;
+    --input: #f7f7f8;
+    --hover: #ececec;
+    --accent: #2563eb;
+}
+
+body.dark {
+    --bg: #171717;
+    --sidebar: #202020;
+    --text: #f5f5f5;
+    --muted: #aaa;
+    --border: #333;
+    --input: #242424;
+    --hover: #303030;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    transition: 0.25s;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.logo-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #111;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.new-chat {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+}
+
+.new-chat:hover {
+    background: var(--hover);
+}
+
+.nav {
+    margin-top: 15px;
+}
+
+.nav button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    padding: 12px;
+    border-radius: 9px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.nav button:hover {
+    background: var(--hover);
+}
+
+.history-title {
+    margin: 20px 10px 8px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.history {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.history-item {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item:hover {
+    background: var(--hover);
+}
+
+.profile {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #555;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-text {
+    font-size: 14px;
+}
+
+/* ================= MAIN ================= */
+
+.main {
+    margin-left: 260px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER */
+
+.header {
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.tabs {
+    background: var(--input);
+    padding: 4px;
+    border-radius: 12px;
+    display: flex;
+    gap: 3px;
+}
+
+.tab {
+    border: none;
+    padding: 9px 28px;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.tab.active {
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+}
+
+/* MENU */
+
+.menu-btn {
+    display: none;
+    position: absolute;
+    left: 15px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 23px;
+}
+
+/* ================= CHAT ================= */
+
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 10%;
+}
+
+.welcome {
+    min-height: 75%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.welcome h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+}
+
+.suggestions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.suggestion {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.suggestion:hover {
+    background: var(--hover);
+}
+
+/* MESSAGES */
+
+.message {
+    max-width: 850px;
+    margin: 0 auto 25px;
+}
+
+.user-message {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.user-bubble {
+    background: var(--input);
+    padding: 12px 17px;
+    border-radius: 18px;
+    max-width: 70%;
+    white-space: pre-wrap;
+}
+
+.ai-message {
+    line-height: 1.6;
+}
+
+.ai-content {
+    white-space: pre-wrap;
+}
+
+.message-actions {
+    margin-top: 7px;
+    display: flex;
+    gap: 6px;
+}
+
+.message-actions button {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 5px;
+}
+
+.message-actions button:hover {
+    color: var(--text);
+}
+
+/* ================= INPUT ================= */
+
+.input-container {
+    padding: 15px 10% 25px;
+}
+
+.input-box {
+    max-width: 850px;
+    margin: auto;
+    background: var(--input);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 10px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 45px;
+    max-height: 180px;
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    padding: 8px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.input-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left-tools,
+.right-tools {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tool-btn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.tool-btn:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.think.active {
+    color: var(--accent);
+    background: rgba(37,99,235,0.1);
+}
+
+.send-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--text);
+    color: var(--bg);
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.stop-btn {
+    display: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: #d33;
+    color: white;
+    cursor: pointer;
+}
+
+/* ================= WORK ================= */
+
+.work-page {
+    display: none;
+    padding: 50px 10%;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.work-page h1 {
+    margin-bottom: 10px;
+}
+
+.work-card {
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.work-card input,
+.work-card textarea {
+    border: 1px solid var(--border);
+    background: var(--input);
+    border-radius: 10px;
+    margin: 7px 0;
+}
+
+.work-card button {
+    padding: 9px 15px;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+/* ================= SETTINGS ================= */
+
+.settings-page {
+    display: none;
+    padding: 50px 10%;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.setting {
+    max-width: 700px;
+    padding: 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width: 750px) {
+
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .menu-btn {
+        display: block;
+    }
+
+    .chat-area {
+        padding: 20px;
+    }
+
+    .input-container {
+        padding: 10px;
+    }
+
+    .user-bubble {
+        max-width: 85%;
+    }
+
+    .welcome h1 {
+        font-size: 23px;
+    }
+
+    .suggestion {
+        font-size: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">AI</div>
+        AI GPT
+    </div>
+
+    <button class="new-chat" onclick="newChat()">
+        ＋ New Chat
+    </button>
+
+    <div class="nav">
+
+        <button onclick="showSearch()">
+            🔍 Search
+        </button>
+
+        <button onclick="showChat()">
+            💬 Chats
+        </button>
+
+        <button onclick="showWork()">
+            💼 Work
+        </button>
+
+        <button onclick="showSettings()">
+            ⚙ Settings
+        </button>
+
+    </div>
+
+    <div class="history-title">
+        CHAT HISTORY
+    </div>
+
+    <div class="history" id="history"></div>
+
+    <div class="profile">
+        <div class="avatar">S</div>
+        <div class="profile-text">
+            User
+        </div>
+    </div>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+    <header class="header">
+
+        <button class="menu-btn" onclick="toggleSidebar()">
+            ☰
+        </button>
+
+        <div class="tabs">
+
+            <button
+                class="tab active"
+                id="chatTab"
+                onclick="showChat()">
+                Chat
+            </button>
+
+            <button
+                class="tab"
+                id="workTab"
+                onclick="showWork()">
+                ✦ Work
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= CHAT PAGE ================= -->
+
+    <section class="chat-area" id="chatArea">
+
+        <div class="welcome" id="welcome">
+
+            <h1>What's on your mind today?</h1>
+
+            <div class="suggestions">
+
+                <button class="suggestion"
+                    onclick="useSuggestion('Explain quantum computing simply')">
+                    Explain quantum computing
+                </button>
+
+                <button class="suggestion"
+                    onclick="useSuggestion('Help me write Python code')">
+                    Help me write Python code
+                </button>
+
+                <button class="suggestion"
+                    onclick="useSuggestion('Give me an innovative project idea')">
+                    Project idea
+                </button>
+
+                <button class="suggestion"
+                    onclick="useSuggestion('Explain this topic step by step')">
+                    Explain step by step
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="messages"></div>
+
+    </section>
+
+
+    <!-- ================= INPUT ================= -->
+
+    <div class="input-container" id="inputContainer">
+
+        <div class="input-box">
+
+            <textarea
+                id="messageInput"
+                placeholder="Ask anything..."
+                onkeydown="handleKey(event)"
+                oninput="autoResize(this)">
+            </textarea>
+
+            <div class="input-tools">
+
+                <div class="left-tools">
+
+                    <button class="tool-btn"
+                        onclick="document.getElementById('fileInput').click()"
+                        title="Attach file">
+                        ＋
+                    </button>
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        hidden
+                        onchange="fileSelected(event)">
+
+                    <button
+                        class="tool-btn think"
+                        id="thinkButton"
+                        onclick="toggleThink()">
+                        ◉ Think
+                    </button>
+
+                </div>
+
+                <div class="right-tools">
+
+                    <button
+                        class="tool-btn"
+                        onclick="startVoice()"
+                        title="Voice input">
+                        🎙
+                    </button>
+
+                    <button
+                        class="stop-btn"
+                        id="stopButton"
+                        onclick="stopGeneration()">
+                        ■
+                    </button>
+
+                    <button
+                        class="send-btn"
+                        id="sendButton"
+                        onclick="sendMessage()">
+                        ↑
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= WORK PAGE ================= -->
+
+    <section class="work-page" id="workPage">
+
+        <h1>Work</h1>
+
+        <p>
+            Create tasks and use AI to help complete them.
+        </p>
+
+        <div class="work-card">
+
+            <h3>New Work</h3>
+
+            <input
+                id="workTitle"
+                placeholder="Task title">
+
+            <textarea
+                id="workDescription"
+                placeholder="Describe your task">
+            </textarea>
+
+            <br>
+
+            <button onclick="createWork()">
+                + Create Task
+            </button>
+
+        </div>
+
+        <div id="workList"></div>
+
+    </section>
+
+
+    <!-- ================= SETTINGS ================= -->
+
+    <section class="settings-page" id="settingsPage">
+
+        <h1>Settings</h1>
+
+        <div class="setting">
+            <span>Dark Mode</span>
+            <button onclick="toggleDark()">Toggle</button>
+        </div>
+
+        <div class="setting">
+            <span>Enter to send</span>
+            <input
+                type="checkbox"
+                id="enterSetting"
+                checked>
+        </div>
+
+        <div class="setting">
+            <span>Show timestamps</span>
+            <input
+                type="checkbox"
+                checked>
+        </div>
+
+        <div class="setting">
+            <span>Voice output</span>
+            <input
+                type="checkbox"
+                checked>
+        </div>
+
+        <div class="setting">
+            <span>Clear all chat history</span>
+            <button onclick="clearHistory()">
+                Clear
+            </button>
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
+let conversations =
+    JSON.parse(localStorage.getItem("aiGPTChats")) || [];
+
+let currentChat = null;
+
+let thinkMode = false;
+
+let controller = null;
+
+
+/* ==========================================
+   INITIALIZE
+========================================== */
+
+window.onload = function() {
+
+    renderHistory();
+
+    if (conversations.length > 0) {
+
+        currentChat = conversations[0];
+
+        renderMessages();
+
+    }
+
+};
+
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+function toggleSidebar() {
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("open");
+
+}
+
+
+/* ==========================================
+   NEW CHAT
+========================================== */
+
+function newChat() {
+
+    currentChat = {
+        id: Date.now(),
+        title: "New Chat",
+        messages: []
+    };
+
+    conversations.unshift(currentChat);
+
+    saveChats();
+
+    renderHistory();
+
+    renderMessages();
+
+    document.getElementById("messageInput").focus();
+
+}
+
+
+/* ==========================================
+   SAVE
+========================================== */
+
+function saveChats() {
+
+    localStorage.setItem(
+        "aiGPTChats",
+        JSON.stringify(conversations)
+    );
+
+}
+
+
+/* ==========================================
+   HISTORY
+========================================== */
+
+function renderHistory() {
+
+    const history =
+        document.getElementById("history");
+
+    history.innerHTML = "";
+
+    conversations.forEach(chat => {
+
+        const item =
+            document.createElement("div");
+
+        item.className = "history-item";
+
+        item.textContent =
+            chat.title || "New Chat";
+
+        item.onclick = () => {
+
+            currentChat = chat;
+
+            renderMessages();
+
+        };
+
+        history.appendChild(item);
+
+    });
+
+}
+
+
+/* ==========================================
+   RENDER MESSAGES
+========================================== */
+
+function renderMessages() {
+
+    const messages =
+        document.getElementById("messages");
+
+    const welcome =
+        document.getElementById("welcome");
+
+    messages.innerHTML = "";
+
+    if (!currentChat ||
+        currentChat.messages.length === 0) {
+
+        welcome.style.display = "flex";
+
+        return;
+
+    }
+
+    welcome.style.display = "none";
+
+    currentChat.messages.forEach(msg => {
+
+        addMessageToUI(
+            msg.role,
+            msg.content,
+            false
+        );
+
+    });
+
+}
+
+
+/* ==========================================
+   ADD MESSAGE
+========================================== */
+
+function addMessageToUI(
+    role,
+    content,
+    actions = true
+) {
+
+    const messages =
+        document.getElementById("messages");
+
+    const wrapper =
+        document.createElement("div");
+
+    wrapper.className =
+        "message " +
+        (role === "user"
+            ? "user-message"
+            : "ai-message");
+
+    if (role === "user") {
+
+        wrapper.innerHTML = `
+            <div class="user-bubble">
+                ${escapeHTML(content)}
+            </div>
+        `;
+
+    } else {
+
+        const safe =
+            escapeHTML(content);
+
+        wrapper.innerHTML = `
+            <div class="ai-content">
+                ${safe}
+            </div>
+
+            ${
+                actions
+                ?
+                `
+                <div class="message-actions">
+
+                    <button
+                        onclick="copyText(this)">
+                        📋 Copy
+                    </button>
+
+                    <button
+                        onclick="speakText(this)">
+                        🔊 Speak
+                    </button>
+
+                </div>
+                `
+                : ""
+            }
+        `;
+
+    }
+
+    messages.appendChild(wrapper);
+
+    document
+        .getElementById("chatArea")
+        .scrollTop =
+        document.getElementById("chatArea").scrollHeight;
+
+    return wrapper;
+
+}
+
+
+/* ==========================================
+   SEND MESSAGE
+========================================== */
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById("messageInput");
+
+    const text =
+        input.value.trim();
+
+    if (!text) return;
+
+
+    if (!currentChat) {
+        newChat();
+    }
+
+
+    currentChat.messages.push({
+        role: "user",
+        content: text
+    });
+
+
+    if (currentChat.title === "New Chat") {
+
+        currentChat.title =
+            text.substring(0, 35);
+
+    }
+
+
+    input.value = "";
+
+    autoResize(input);
+
+    document
+        .getElementById("welcome")
+        .style.display = "none";
+
+
+    addMessageToUI(
+        "user",
+        text
+    );
+
+
+    saveChats();
+
+    renderHistory();
+
+
+    /* Loading message */
+
+    const loading =
+        addMessageToUI(
+            "assistant",
+            "Thinking..."
+        );
+
+
+    controller =
+        new AbortController();
+
+
+    document
+        .getElementById("sendButton")
+        .style.display = "none";
+
+    document
+        .getElementById("stopButton")
+        .style.display = "block";
+
+
+    try {
+
+        /*
+        IMPORTANT:
+
+        Your backend should provide:
+
+        POST /api/chat
+
+        Body:
+        {
+            messages: [...]
+        }
+
+        It should return:
+
+        {
+            reply: "AI response"
+        }
+        */
+
+        const response =
+            await fetch(
+                "/api/chat",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        messages:
+                            currentChat.messages,
+
+                        think:
+                            thinkMode
+
+                    }),
+
+                    signal:
+                        controller.signal
+                }
+            );
+
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Request failed (${response.status})`);
+        }
+
+        const data = await response.json();
+        loading.remove();
+
+        currentChat.messages.push({
+            role: "assistant",
+            content: data.reply || "I couldn't generate a response."
+        });
+
+        addMessageToUI("assistant", data.reply || "I couldn't generate a response.");
+        saveChats();
+
+    } catch (error) {
+        loading.remove();
+
+        if (error.name !== "AbortError") {
+            addMessageToUI("assistant", `Error: ${error.message}`);
+        }
+    } finally {
+        controller = null;
+        document.getElementById("sendButton").style.display = "block";
+        document.getElementById("stopButton").style.display = "none";
+        input.focus();
+    }
+}
+
+
+/* ==========================================
+   INPUT AND MESSAGE ACTIONS
+========================================== */
+
+function handleKey(event) {
+    const enterToSend = document.getElementById("enterSetting").checked;
+
+    if (event.key === "Enter" && !event.shiftKey && enterToSend) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+function autoResize(input) {
+    input.style.height = "auto";
+    input.style.height = `${Math.min(input.scrollHeight, 180)}px`;
+}
+
+function useSuggestion(text) {
+    const input = document.getElementById("messageInput");
+    input.value = text;
+    autoResize(input);
+    input.focus();
+}
+
+function toggleThink() {
+    thinkMode = !thinkMode;
+    document.getElementById("thinkButton").classList.toggle("active", thinkMode);
+}
+
+function stopGeneration() {
+    if (controller) controller.abort();
+}
+
+function copyText(button) {
+    const content = button.closest(".ai-message").querySelector(".ai-content").textContent;
+    navigator.clipboard.writeText(content);
+}
+
+function speakText(button) {
+    const content = button.closest(".ai-message").querySelector(".ai-content").textContent;
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(content));
+    }
+}
+
+function fileSelected(event) {
+    const file = event.target.files[0];
+    if (file) useSuggestion(`Please help me with this file: ${file.name}`);
+}
+
+function startVoice() {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+        addMessageToUI("assistant", "Voice input is not supported in this browser.");
+        return;
+    }
+
+    const recognition = new Recognition();
+    recognition.onresult = event => useSuggestion(event.results[0][0].transcript);
+    recognition.start();
+}
+
+function escapeHTML(value) {
+    const element = document.createElement("div");
+    element.textContent = value;
+    return element.innerHTML;
+}
+
+
+/* ==========================================
+   PAGE NAVIGATION
+========================================== */
+
+function showChat() {
+    document.getElementById("chatArea").style.display = "block";
+    document.getElementById("inputContainer").style.display = "block";
+    document.getElementById("workPage").style.display = "none";
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("chatTab").classList.add("active");
+    document.getElementById("workTab").classList.remove("active");
+}
+
+function showWork() {
+    document.getElementById("chatArea").style.display = "none";
+    document.getElementById("inputContainer").style.display = "none";
+    document.getElementById("workPage").style.display = "block";
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("chatTab").classList.remove("active");
+    document.getElementById("workTab").classList.add("active");
+}
+
+function showSettings() {
+    document.getElementById("chatArea").style.display = "none";
+    document.getElementById("inputContainer").style.display = "none";
+    document.getElementById("workPage").style.display = "none";
+    document.getElementById("settingsPage").style.display = "block";
+}
+
+function showSearch() {
+    const query = window.prompt("Search chats");
+    if (!query) return;
+
+    const match = conversations.find(chat =>
+        chat.title.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (match) {
+        currentChat = match;
+        showChat();
+        renderMessages();
+    }
+}
+
+function toggleDark() {
+    document.body.classList.toggle("dark");
+}
+
+function createWork() {
+    const title = document.getElementById("workTitle").value.trim();
+    const description = document.getElementById("workDescription").value.trim();
+    if (!title) return;
+
+    const item = document.createElement("div");
+    item.className = "work-card";
+    item.innerHTML = `<h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p>`;
+    document.getElementById("workList").prepend(item);
+    document.getElementById("workTitle").value = "";
+    document.getElementById("workDescription").value = "";
+}
+
+function clearHistory() {
+    conversations = [];
+    currentChat = null;
+    saveChats();
+    renderHistory();
+    renderMessages();
+}
+
+</script>
+</body>
+</html>
